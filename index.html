@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Reptile Animation</title>
+
+<style>
+html,body{
+margin:0;
+overflow:hidden;
+background:#05071a;
+}
+canvas{
+display:block;
+}
+</style>
+
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<script>
+
+const canvas=document.getElementById("c");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+}
+resize();
+window.onresize=resize;
+
+const mouse={
+x:canvas.width/2,
+y:canvas.height/2
+};
+
+window.onmousemove=e=>{
+mouse.x=e.clientX;
+mouse.y=e.clientY;
+};
+
+const body=[];
+
+for(let i=0;i<70;i++){
+body.push({
+x:canvas.width/2,
+y:canvas.height/2,
+r:16-i*0.18
+});
+}
+
+function animate(){
+
+requestAnimationFrame(animate);
+
+ctx.fillStyle="#05071a";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+body[0].x+=(mouse.x-body[0].x)*0.15;
+body[0].y+=(mouse.y-body[0].y)*0.15;
+
+for(let i=1;i<body.length;i++){
+
+let prev=body[i-1];
+let cur=body[i];
+
+let dx=prev.x-cur.x;
+let dy=prev.y-cur.y;
+
+let dist=Math.sqrt(dx*dx+dy*dy);
+
+let angle=Math.atan2(dy,dx);
+
+let spacing=8;
+
+cur.x=prev.x-Math.cos(angle)*spacing;
+cur.y=prev.y-Math.sin(angle)*spacing;
+}
+
+ctx.strokeStyle="white";
+ctx.lineWidth=2;
+
+for(let i=0;i<body.length;i++){
+
+let p=body[i];
+
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.stroke();
+
+if(i%4==0 && i<body.length-1){
+
+let next=body[i+1];
+
+let angle=Math.atan2(next.y-p.y,next.x-p.x)+Math.PI/2;
+
+let len=15;
+
+ctx.beginPath();
+ctx.moveTo(p.x,p.y);
+ctx.lineTo(
+p.x+Math.cos(angle)*len,
+p.y+Math.sin(angle)*len
+);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.moveTo(p.x,p.y);
+ctx.lineTo(
+p.x-Math.cos(angle)*len,
+p.y-Math.sin(angle)*len
+);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.arc(
+p.x+Math.cos(angle)*len,
+p.y+Math.sin(angle)*len,
+2,
+0,
+Math.PI*2
+);
+ctx.fillStyle="white";
+ctx.fill();
+
+ctx.beginPath();
+ctx.arc(
+p.x-Math.cos(angle)*len,
+p.y-Math.sin(angle)*len,
+2,
+0,
+Math.PI*2
+);
+ctx.fill();
+}
+
+}
+
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
